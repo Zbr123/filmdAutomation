@@ -31,3 +31,4 @@ Feature: Create a new Production
     And I enter "This is a sample project bio" in "Production Bio" field
     And I click on the "Submit" button
     Then I should see the submitted project title
+
