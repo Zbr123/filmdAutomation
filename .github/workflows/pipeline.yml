@@ -4,7 +4,7 @@ name: Run Cypress Tests
 on:
   push:
     branches:
-      - master  # Change this to 'master' instead of 'main' or 'develop'
+      - master  # You can add other branches if needed
 
 jobs:
   test:
@@ -28,16 +28,7 @@ jobs:
       run: |
         npx cypress run --spec 'cypress/e2e/**/*.feature' --env environment=${{ github.ref }}
 
-    - name: Upload test results and videos/screenshots (optional)
-      if: always()  # Ensures this step runs even if tests fail
+    # Optionally, you can add a step to log the result of the tests (pass/fail status)
+    - name: Display test result
       run: |
-        mkdir -p artifacts/videos
-        mkdir -p artifacts/screenshots
-        cp -r cypress/videos artifacts/videos
-        cp -r cypress/screenshots artifacts/screenshots
-
-    - name: Upload Cypress artifacts to GitHub
-      uses: actions/artifact@v3  # Updated to the correct v3 action
-      with:
-        name: cypress-artifacts
-        path: artifacts/
+        if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
