@@ -4,7 +4,8 @@ name: Run Cypress Tests
 on:
   push:
     branches:
-      - master  # You can add more branches here if needed
+      - main
+      - develop  # You can add more branches here if needed
 
 jobs:
   test:
@@ -38,7 +39,7 @@ jobs:
         cp -r cypress/screenshots artifacts/screenshots
 
     - name: Upload Cypress artifacts to GitHub
-      uses: actions/upload-artifact@v3  # Updated to v3
+      uses: github-actions/upload-artifact@v3  # Updated to v3 from actions/upload-artifact
       with:
         name: cypress-artifacts
         path: artifacts/
