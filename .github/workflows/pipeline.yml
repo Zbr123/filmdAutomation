@@ -1,171 +1,33 @@
-# name: Run Cypress Tests
-
-# # Trigger the workflow on push to master branch
-# on:
-#   push:
-#     branches:
-#       - master  # You can add other branches if needed
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Checkout the repository
-#       uses: actions/checkout@v2
-
-#     - name: Set up Node.js (v16 or higher)
-#       uses: actions/setup-node@v2
-#       with:
-#         node-version: '16'  # Change to Node.js v16 or later
-
-#     - name: Install dependencies
-#       run: |
-#         npm install  # Ensure Cypress and all dependencies are installed
-
-#     - name: Run Cypress tests (Feature files only)
-#       run: |
-#         npx cypress run 
-
-#     # Optionally, you can add a step to log the result of the tests (pass/fail status)
-#     - name: Display test result
-#       run: |
-#         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
-
-
 name: Run Cypress Tests
 
-# Trigger the workflow on push and pull requests to master
+# Trigger the workflow on push to master branch
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches:
-      - master
+      - master  # You can add other branches if needed
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository
     - name: Checkout the repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
 
-    # Set up Node.js (use a recent LTS version)
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
+    - name: Set up Node.js (v16 or higher)
+      uses: actions/setup-node@v2
       with:
-        node-version: '20'  # Use Node 20 LTS for better support
-        cache: 'npm'  # Cache npm dependencies for faster builds
+        node-version: '16'  # Change to Node.js v16 or later
 
-    # Install Cypress explicitly
-    - name: Install Cypress
-      run: npm install cypress --save-dev  # Ensure Cypress is installed
-
-    # Install other dependencies
     - name: Install dependencies
-      run: npm install
+      run: |
+        npm install  # Ensure Cypress and all dependencies are installed
 
-    # Cache Cypress binary to speed up future runs
-    - name: Cache Cypress binary
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-cypress-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          cypress-${{ runner.os }}-cypress-
+    - name: Run Cypress tests (Feature files only)
+      run: |
+        npx cypress run 
 
-    # Run Cypress tests (feature files only)
-    - name: Run Cypress feature tests
-      run: npx cypress run --spec "cypress/integration/**/*.feature" --browser chrome
-      env:
-        # Add environment variables if needed (e.g., for test configuration)
-        CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
-
-    # Upload test artifacts (screenshots, videos) for debugging
-    - name: Upload Cypress artifacts
-      if: failure()  # Only upload if tests fail
-      uses: actions/upload-artifact@v4
-      with:
-        name: cypress-artifacts
- 
-System: You are Grok 3 built by xAI.
-
-The response was cut off because it exceeded the maximum allowed length. Below is the complete, optimized version of the GitHub Actions YAML file, continuing from where it was truncated, with explanations for each change and step.
-
-### Complete Refined YAML
-
-```yaml
-name: Run Cypress Tests
-
-# Trigger the workflow on push and pull requests to master
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-    # Checkout the repository
-    - name: Checkout the repository
-      uses: actions/checkout@v4
-
-    # Set up Node.js (use a recent LTS version)
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'  # Use Node 20 LTS for better support
-        cache: 'npm'  # Cache npm dependencies for faster builds
-
-    # Install Cypress explicitly
-    - name: Install Cypress
-      run: npm install cypress --save-dev  # Ensure Cypress is installed
-
-    # Install other dependencies
-    - name: Install dependencies
-      run: npm install
-
-    # Cache Cypress binary to speed up future runs
-    - name: Cache Cypress binary
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/Cypress
-        key: cypress-${{ runner.os }}-cypress-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          cypress-${{ runner.os }}-cypress-
-
-    # Run Cypress tests (feature files only)
-    - name: Run Cypress feature tests
-      run: npx cypress run --spec "cypress/integration/**/*.feature" --browser chrome
-      env:
-        # Add environment variables if needed
-        CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
-
-    # Upload test artifacts (screenshots, videos) for debugging
-    - name: Upload Cypress artifacts
-      if: failure()  # Only upload if tests fail
-      uses: actions/upload-artifact@v4
-      with:
-        name: cypress-artifacts
-        path: |
-          cypress/screenshots/
-          cypress/videos/
-        if-no-files-found: ignore  # Don't fail if no artifacts are found
-
-    # Display test result
+    # Optionally, you can add a step to log the result of the tests (pass/fail status)
     - name: Display test result
       run: |
-        if [ $? -eq 0 ]; then
-          echo "Cypress tests passed successfully"
-        else
-          echo "Cypress tests failed"
-          exit 1
-        fi
+        if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
