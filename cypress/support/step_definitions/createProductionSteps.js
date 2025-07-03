@@ -1,74 +1,59 @@
-// import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-// import CreateProductionPage from "../pageObjects/createProductionPage";
+import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
+import CreateProductionPage from "../pageObjects/createProductionPage";
 
-// const createProduction = new CreateProductionPage();
-
-// // When("I click on the side navbar", () => {
-// //   productionSearch.clickSideNavbar();
-// // });
-
-// // When("I click on Productions text", () => {
-// //   productionSearch.clickProductionsText();
-// // });
-
-// When("I click on Production Suite text", () => {
-//   productionSearch.clickProductionSuiteText();
-// });
-
-// Then("I should see Welcome to Productions text", () => {
-//   productionSearch.verifyWelcomeToProductions();
-// });
-
-// When("I click on the Create Production button", () => {
-//   productionSearch.clickCreateProductionButton();
-// });
+const createProduction = new CreateProductionPage();
 
 
-// Then("I should see Production Creation text", () => {
-//   productionSearch.verifyProductionCreation();
-// });
+When("I click on Production Suite text", () => {
+  createProduction.clickProductionSuite();
+});
 
-// //Search Filters Field 
+Then("I should see Welcome to Productions text", () => {
+  createProduction.verifyWelcomeToProductions();
+});
 
-// When("I click on the Type dropdown", () => {
-//   productionSearch.clickTypeDropdown();
-// });
-
-// When("I select {string} from the Type dropdown", (option) => {
-//   productionSearch.selectTypeItem(option);
-// });
-
-// When("I click on the Genre dropdown", () => {
-//   productionSearch.clickGenreDropdown();
-// });
-
-// When("I select {string} from the Genre dropdown", (gender) => {
-//   productionSearch.selectGenreItem(gender);
-// });
+When("I click on the Create Production button", () => {
+  createProduction.clickCreateProductionButton();
+});
 
 
-// When("I click on the Status dropdown", () => {
-//   productionSearch.clickStatusDropdown();
-// });
+Then("I should see Production Creation text", () => {
+  createProduction.verifyProductionCreation();
+});
 
-// When("I select {string} from the Status dropdown", (appearance) => {
-//   productionSearch.selectStatusItem(appearance);
-// });
+When("I click the image upload icon", () => {
+  createProduction.clickImageUploadIcon();
+});
 
-// When("I click the Search button", () => {
-//   productionSearch.clickSearchButton();
-// });
 
-// //RESULTS
+When("I upload an image from desktop", () => {
+  createProduction.uploadImageFromDesktop();
+});
 
-// Then("I should see production search results with Type {string} in a user info job title", (type) => {
-//   productionSearch.verifyTypeInJobTitle(type);
-// });
 
-// Then("I should see production search results with Status {string} in a user info job title", (status) => {
-//   productionSearch.verifyStatusInJobTitle(status);
-// });
+When('I enter {string} in {string} field', (value, label) => {
+  createProduction.enterValueInField(label, value);
+});
 
-// Then("I should see No result found text", () => {
-//   productionSearch.verifyNoResults();
-// });
+When('I click on the {string} dropdown', (label) => {
+  createProduction.clickDynamicDropdown(label);
+});
+
+When('I select {string} from the {string} dropdown', (option, label) => {
+  createProduction.selectDynamicDropdownOption(label, option);
+});
+
+When('I check the {string} checkbox', (labelText) => {
+  createProduction.checkCheckboxByLabel(labelText);
+});
+
+When('I click on the {string} button', (buttonLabel) => {
+  createProduction.clickButtonByLabel(buttonLabel);
+});
+
+Then('I should see the submitted project title', () => {
+  createProduction.verifySubmittedProjectTitle();
+});
+
+
+

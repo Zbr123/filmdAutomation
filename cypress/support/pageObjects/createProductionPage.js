@@ -1,15 +1,7 @@
 class CreateProductionPage {
 
-  clickSideNavbar() {
-    cy.xpath('//a[@id="navbarDropdownMM-1" and contains(@class, "nav-link dropdown-toggle menu-bar-icon")]').click();
-  }
-
-  clickProductionsText() {
-    cy.xpath('//span[contains(@class, "qLink-link-menuText") and contains(text(), "Productions")]').click();
-  }
-
-  clickProductionSuiteText() {
-    cy.xpath('//a[contains(@class, "qLink-link dropdown-item icon") and .//span[contains(@class, "qLink-subLink-menuText") and contains(text(), "Productions Suite")]]').click();
+  clickProductionSuite() {
+    cy.xpath('//span[contains(@class, "d-block qLink-subLink-menuText") and contains(text(), "Production Suite")]').click();
   }
 
   verifyWelcomeToProductions() {
@@ -24,50 +16,59 @@ class CreateProductionPage {
     cy.xpath('//h1[@id="pageTitleHeading" and contains(text(), "Production Creation")]').should('be.visible');
   }
 
-
-
-
-  clickTypeDropdown() {
-    cy.xpath('//div[contains(@class, "multiselect__select") and ancestor::div[contains(@class, "form-group") and .//label[contains(text(), "Type") or contains(text(), "Type")]]]').click({ force: true });
+  clickImageUploadIcon() {
+    cy.xpath('//label[contains(@class, "custom-file-label") and @for="uploadProfileImage" and .//span[contains(text(), "Add Photo")]]').click({ force: true });
   }
 
-  selectTypeItem(option) {
-    cy.xpath(`//li[contains(@class, "multiselect__element") and .//span[contains(text(), "${option}")]]`).first().click();
-  }
-
-
-  clickGenreDropdown() {
-    cy.xpath('//div[contains(@class, "multiselect__select") and ancestor::div[contains(@class, "form-group") and .//label[contains(text(), "Genre") or contains(text(), "Genre")]]]').click({ force: true });
-  }
-
-  selectGenreItem(gender) {
-    cy.xpath(`//li[contains(@class, "multiselect__element") and .//span[contains(text(), "${gender}")]]`).first().click();
+  uploadImageFromDesktop() {
+    const imagePath = 'images/profile.png'; // path inside cypress/fixtures/images/
+    cy.get('input[type="file"]#uploadProfileImage').attachFile(imagePath);
   }
 
 
-  clickStatusDropdown() {
-    cy.xpath('//div[contains(@class, "multiselect__select") and ancestor::div[contains(@class, "form-group") and .//label[contains(text(), "Status") or contains(text(), "Status")]]]').click({ force: true });
+enterValueInField(label, value) {
+  let selector;
+
+  switch (label) {
+    case 'Production Title':
+      selector = 'input[name="projectName"]';
+      break;
+    case 'Location':
+      selector = 'input[name="search_location"]';
+      break;
+    case 'Production Bio':
+      selector = 'textarea#projectBio';
+      break;
+    default:
+      throw new Error(`Unsupported field label: ${label}`);
   }
 
-  selectStatusItem(appearance) {
-    cy.xpath(`//li[contains(@class, "multiselect__element") and .//span[contains(text(), "${appearance}")]]`).first().click();
-  }
+  cy.get(selector).clear().type(value);
+}
 
-  clickSearchButton() {
-    cy.xpath('//button[@id="btnSearch1" and contains(@class, "btn btn-primary btn-block text-uppercase")]').click();
-  }
+clickDynamicDropdown(labelText) {
+  cy.xpath(`//div[contains(@class, "form-group") and .//label[contains(text(), "${labelText}")]]
+    //div[contains(@class, "multiselect__select")]`).click({ force: true });
+}
 
-  verifyTypeInJobTitle(type) {
-    cy.xpath(`//div[contains(@class, "user_info_job_title") and contains(text(), "${type}")]`).should('be.visible');
-  }
+selectDynamicDropdownOption(labelText, optionText) {
+  cy.xpath(`//div[contains(@class, "form-group") and .//label[contains(text(), "${labelText}")]]
+    //ul[contains(@class, "multiselect__content")]//li//span[contains(text(), "${optionText}")]`).first().click({ force: true });
+}
 
-  verifyStatusInJobTitle(status) {
-    cy.xpath(`//div[contains(@class, "user_info_job_title") and contains(text(), "${status}")]`).should('be.visible');
-  }
+checkCheckboxByLabel(labelText) {
+  // Escaping curly quotes or odd characters in label
+  cy.xpath(`//label[normalize-space(text())="${labelText}"]`).click({ force: true });
+}
 
-  verifyNoResults() {
-    cy.xpath('//div[contains(@class, "col-12") and contains(text(), "No result found")]').should('be.visible');
-  }
+clickButtonByLabel(labelText) {
+  cy.xpath(`//button[contains(@id, 'btnSubmitProject') and contains(text(), "${labelText}")]`).click({ force: true });
+}
+
+verifySubmittedProjectTitle() {
+  cy.get('.view-project > .article__title > .custom-font-weight-bolder')
+    .should('be.visible');
+}
 
 
 
