@@ -1,11 +1,10 @@
 name: Run Cypress Tests
 
-# Trigger the workflow on push to main or develop branches
+# Trigger the workflow on push to master branch
 on:
   push:
     branches:
-      - main
-      - develop  # You can add more branches here if needed
+      - master  # Change this to 'master' instead of 'main' or 'develop'
 
 jobs:
   test:
@@ -19,7 +18,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Or the version that you're using
+        node-version: '14'  # You can adjust the version if needed
 
     - name: Install dependencies
       run: |
@@ -27,7 +26,6 @@ jobs:
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        # Run all feature files in the 'e2e' directory
         npx cypress run --spec 'cypress/e2e/**/*.feature' --env environment=${{ github.ref }}
 
     - name: Upload test results and videos/screenshots (optional)
@@ -39,7 +37,7 @@ jobs:
         cp -r cypress/screenshots artifacts/screenshots
 
     - name: Upload Cypress artifacts to GitHub
-      uses: actions/upload-artifact@v2  # Use version 2, which is supported
+      uses: actions/upload-artifact@v2  # Correct version
       with:
         name: cypress-artifacts
         path: artifacts/
