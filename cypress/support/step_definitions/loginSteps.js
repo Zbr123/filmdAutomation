@@ -3,9 +3,11 @@ import LoginPage from "../pageObjects/loginPage";
 
 const login = new LoginPage();
 
+
 Given("I am on the login page", () => {
   cy.visit("https://filmd-apps-dev-uks-app-app-01.azurewebsites.net/acc/login");
 });
+
 
 When("I enters email {string} and password {string}", (email, password) => {
   login.enterEmail(email);
