@@ -37,7 +37,7 @@ jobs:
         cp -r cypress/screenshots artifacts/screenshots
 
     - name: Upload Cypress artifacts to GitHub
-      uses: @actions/artifact@v3  # Updated to the correct v3 action
+      uses: actions/artifact@v3  # Updated to the correct v3 action
       with:
         name: cypress-artifacts
         path: artifacts/
