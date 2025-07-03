@@ -10,15 +10,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # Steps to set up the environment and run tests
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
+    - name: Set up Node.js (v16 or higher)
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # You can adjust the version if needed
+        node-version: '16'  # Change to Node.js v16 or later
 
     - name: Install dependencies
       run: |
@@ -26,7 +25,7 @@ jobs:
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --spec 'cypress/e2e/**/*.feature' --env environment=${{ github.ref }}
+        npx cypress run 
 
     # Optionally, you can add a step to log the result of the tests (pass/fail status)
     - name: Display test result
