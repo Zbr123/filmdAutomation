@@ -4,8 +4,7 @@ name: Run Cypress Tests
 on:
   push:
     branches:
-      - main
-      - develop  # You can add more branches here if needed
+      - master # You can add more branches here if needed
 
 jobs:
   test:
