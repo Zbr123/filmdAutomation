@@ -35,8 +35,8 @@ module.exports = defineConfig({
     },
     env: {
       baseUrl: process.env.CYPRESS_baseUrl || "https://filmd-apps-dev-uks-app-app-01.azurewebsites.net",
-      validEmail: process.env.CYPRESS_validEmail || "muhammad.a@yetiinc.com",
-      validPassword: process.env.CYPRESS_validPassword || "Staging2024"
+      validEmail: process.env.CYPRESS_validEmail || "zubair.a@yetiinc.com",
+      validPassword: process.env.CYPRESS_validPassword || "Vista123+"
     },
   },
 });
