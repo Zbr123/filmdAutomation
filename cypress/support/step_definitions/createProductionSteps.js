@@ -3,10 +3,6 @@ import CreateProductionPage from "../pageObjects/createProductionPage";
 
 const createProduction = new CreateProductionPage();
 
-When('I click on the {string} button', (buttonLabel) => {
-  createProduction.clickButtonByLabel(buttonLabel);
-});
-
 
 When("I click on Production Suite text", () => {
   createProduction.clickProductionSuite();
