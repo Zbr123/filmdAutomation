@@ -39,11 +39,11 @@ class LoginPage {
   // }
 
   enterEmail(useremail) {
-    cy.get('input[placeholder="Email"]').clear().type(useremail);
+    cy.get('input[placeholder="Email"]', { timeout: 20000 }).clear().type(useremail);
   }
 
   enterPassword(password) {
-    cy.get('input[placeholder="Password"]').clear().type(password);
+    cy.get('input[placeholder="Password"]', { timeout: 20000 }).clear().type(password);
   }
 
   clickLogin() {
