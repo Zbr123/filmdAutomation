@@ -6,22 +6,11 @@ class LoginPage {
       .type(useremail)
       .then($el => {
         if ($el.length === 0) {
-          cy.log('Placeholder "Email" not found, trying alternatives');
-          // Try common email input types
-          return cy.get('input[type="email"]', { timeout: 20000 })
+          cy.log('Placeholder "Email" not found, trying type="email"');
+          cy.get('input[type="email"]', { timeout: 20000 }) // Fallback
             .should('be.visible')
             .clear()
-            .type(useremail)
-            .then($altEl => {
-              if ($altEl.length === 0) {
-                cy.log('Type "email" not found, capturing DOM and screenshot');
-                cy.document().then(doc => {
-                  cy.writeFile('cypress/debug/email-dom.html', doc.documentElement.outerHTML); // Save DOM
-                });
-                cy.screenshot('email-field-missing');
-                throw new Error('Email input not found with any selector');
-              }
-            });
+            .type(useremail);
         }
       });
   }
@@ -33,21 +22,11 @@ class LoginPage {
       .type(password)
       .then($el => {
         if ($el.length === 0) {
-          cy.log('Placeholder "Password" not found, trying alternatives');
-          return cy.get('input[type="password"]', { timeout: 20000 })
+          cy.log('Placeholder "Password" not found, trying type="password"');
+          cy.get('input[type="password"]', { timeout: 20000 })
             .should('be.visible')
             .clear()
-            .type(password)
-            .then($altEl => {
-              if ($altEl.length === 0) {
-                cy.log('Type "password" not found, capturing DOM and screenshot');
-                cy.document().then(doc => {
-                  cy.writeFile('cypress/debug/password-dom.html', doc.documentElement.outerHTML);
-                });
-                cy.screenshot('password-field-missing');
-                throw new Error('Password input not found with any selector');
-              }
-            });
+            .type(password);
         }
       });
   }
