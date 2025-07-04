@@ -1,6 +1,7 @@
 Feature: Create a new Production
 
   Scenario: User should be able to create a new production
+    When I click on the "Back to home" button
     Given I am on the login page
     When I enters email "muhammad.a@yetiinc.com" and password "Staging2024"
     And clicks on login button

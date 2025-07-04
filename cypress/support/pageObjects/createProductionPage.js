@@ -1,5 +1,11 @@
 class CreateProductionPage {
 
+  clickButtonByLabel(buttonLabel) {
+    cy.get('a.btn.btn--large-padding.pageNotFound-btn__left.btn-outline-white.text-uppercase.font-weight-bold.btn-inline-block.shadow-none.mr-4.mb-4')
+      .contains(buttonLabel)
+      .click({ force: true });
+  }
+
   clickProductionSuite() {
     cy.xpath('//span[contains(@class, "d-block qLink-subLink-menuText") and contains(text(), "Production Suite")]').click();
   }
