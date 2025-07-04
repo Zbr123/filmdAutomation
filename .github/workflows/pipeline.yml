@@ -1,10 +1,43 @@
+# name: Run Cypress Tests
+
+# # Trigger the workflow on push to master branch
+# on:
+#   push:
+#     branches:
+#       - master  # You can add other branches if needed
+
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout the repository
+#       uses: actions/checkout@v2
+
+#     - name: Set up Node.js (v16 or higher)
+#       uses: actions/setup-node@v2
+#       with:
+#         node-version: '16'  # Change to Node.js v16 or later
+
+#     - name: Install dependencies
+#       run: |
+#         npm install  # Ensure Cypress and all dependencies are installed
+
+#     - name: Run Cypress tests (Feature files only)
+#       run: |
+#         npx cypress run 
+
+#     # Optionally, you can add a step to log the result of the tests (pass/fail status)
+#     - name: Display test result
+#       run: |
+#         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
+
 name: Run Cypress Tests
 
-# Trigger the workflow on push to master branch
 on:
   push:
     branches:
-      - master  # You can add other branches if needed
+      - master
 
 jobs:
   test:
@@ -12,22 +45,38 @@ jobs:
 
     steps:
     - name: Checkout the repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Set up Node.js (v16 or higher)
-      uses: actions/setup-node@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: '16'  # Change to Node.js v16 or later
+        node-version: '18'  # Updated to Node.js 18 for better compatibility
 
     - name: Install dependencies
       run: |
-        npm install  # Ensure Cypress and all dependencies are installed
+        npm ci  # Use npm ci for consistent installs in CI
+
+    - name: Set environment variables
+      run: |
+        echo "CYPRESS_baseUrl=https://filmd-apps-dev-uks-app-app-01.azurewebsites.net" >> $GITHUB_ENV
+        echo "CYPRESS_validEmail=${{ secrets.CYPRESS_VALID_EMAIL }}" >> $GITHUB_ENV
+        echo "CYPRESS_validPassword=${{ secrets.CYPRESS_VALID_PASSWORD }}" >> $GITHUB_ENV
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run 
+        npx cypress run --browser chrome --headless
+      env:
+        CYPRESS_baseUrl: ${{ env.CYPRESS_baseUrl }}
+        CYPRESS_validEmail: ${{ env.CYPRESS_validEmail }}
+        CYPRESS_validPassword: ${{ env.CYPRESS_validPassword }}
 
-    # Optionally, you can add a step to log the result of the tests (pass/fail status)
+    - name: Upload screenshots on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots/
+
     - name: Display test result
       run: |
         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
