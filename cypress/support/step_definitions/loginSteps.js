@@ -15,7 +15,8 @@ const login = new LoginPage();
 // });
 
 Given("I am on the login page", () => {
-  cy.visit(Cypress.env('baseUrl') + "/acc/login", { failOnStatusCode: false, timeout: 20000 }); // Match manual URL
+  cy.visit("https://filmd-apps-dev-uks-app-app-01.azurewebsites.net/acc/login");
+  // cy.visit(Cypress.env('baseUrl') + "/acc/login", { failOnStatusCode: false, timeout: 20000 }); // Match manual URL
   cy.wait(4000); // Keep for stabilization
 });
 
