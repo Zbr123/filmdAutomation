@@ -117,7 +117,7 @@
 #     - name: Display test result
 #       run: |
 #         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
-
+# exit
 name: Run Cypress Tests
 
 on:
