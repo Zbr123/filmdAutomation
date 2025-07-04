@@ -15,7 +15,7 @@ const login = new LoginPage();
 // });
 
 Given("I am on the login page", () => {
-  cy.visit(Cypress.env('baseUrl') + "/acc/login", { failOnStatusCode: false, timeout: 20000 });
+  cy.visit(Cypress.env('baseUrl')); // + "/acc/login", { failOnStatusCode: false, timeout: 20000 })
   cy.wait(4000); // Keep for now to stabilize page load
 });
 
