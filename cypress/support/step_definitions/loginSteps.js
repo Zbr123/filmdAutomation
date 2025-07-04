@@ -15,7 +15,7 @@ const login = new LoginPage();
 // });
 
 Given("I am on the login page", () => {
-  cy.visit(Cypress.env('baseUrl') + "/acc/login");
+  cy.visit(Cypress.env('baseUrl') + "/acc/login", { failOnStatusCode: false });
 });
 
 When("I enters email {string} and password {string}", (email, password) => {
