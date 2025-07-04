@@ -15,7 +15,8 @@ const login = new LoginPage();
 // });
 
 Given("I am on the login page", () => {
-  cy.visit(Cypress.env('baseUrl') + "/acc/login", { failOnStatusCode: false });
+  cy.visit(Cypress.env('baseUrl') + "/acc/login", { failOnStatusCode: false, timeout: 10000 });
+  cy.wait(2000); // Wait 2 seconds for page to stabilize (remove after debugging)
 });
 
 When("I enters email {string} and password {string}", (email, password) => {
