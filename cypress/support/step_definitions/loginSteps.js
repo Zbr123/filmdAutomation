@@ -24,7 +24,8 @@ const login = new LoginPage();
 
 
 Given("I am on the login page", () => {
-  cy.visit("https://filmd-apps-dev-uks-app-app-01.azurewebsites.net/acc/login", { failOnStatusCode: false });
+  cy.visit("https://filmd-apps-dev-uks-app-app-01.azurewebsites.net/acc/login", { failOnStatusCode: false, timeout: 20000 });
+  cy.get('body').should('be.visible'); // Basic check to ensure page loads
 });
 
 When("I enters email {string} and password {string}", (email, password) => {
