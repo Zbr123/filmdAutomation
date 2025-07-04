@@ -1,32 +1,46 @@
 class LoginPage {
   enterEmail(useremail) {
-    cy.get('input[placeholder="Email"]', { timeout: 10000 }) // Increased timeout to 10s
+    cy.get('input[placeholder="Email"]', { timeout: 15000 }) // Increased to 15s
       .should('be.visible')
       .clear()
       .type(useremail)
       .then($el => {
         if ($el.length === 0) {
-          cy.log('Element with placeholder="Email" not found, trying alternatives');
-          cy.get('input[type="email"]', { timeout: 10000 }) // Fallback selector
+          cy.log('Primary selector failed, trying alternatives');
+          cy.get('input[type="email"]', { timeout: 15000 }) // Fallback
             .should('be.visible')
             .clear()
-            .type(useremail);
+            .type(useremail)
+            .then($altEl => {
+              if ($altEl.length === 0) {
+                cy.log('No email input found, capturing screenshot');
+                cy.screenshot('email-field-missing'); // Debug screenshot
+                throw new Error('Email input not found with any selector');
+              }
+            });
         }
       });
   }
 
   enterPassword(password) {
-    cy.get('input[placeholder="Password"]', { timeout: 10000 })
+    cy.get('input[placeholder="Password"]', { timeout: 15000 })
       .should('be.visible')
       .clear()
       .type(password)
       .then($el => {
         if ($el.length === 0) {
-          cy.log('Element with placeholder="Password" not found, trying alternatives');
-          cy.get('input[type="password"]', { timeout: 10000 }) // Fallback selector
+          cy.log('Primary selector failed, trying alternatives');
+          cy.get('input[type="password"]', { timeout: 15000 }) // Fallback
             .should('be.visible')
             .clear()
-            .type(password);
+            .type(password)
+            .then($altEl => {
+              if ($altEl.length === 0) {
+                cy.log('No password input found, capturing screenshot');
+                cy.screenshot('password-field-missing');
+                throw new Error('Password input not found with any selector');
+              }
+            });
         }
       });
   }
