@@ -50,25 +50,19 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'  # Updated to Node.js 18 for better compatibility
+        node-version: '18'
 
     - name: Install dependencies
       run: |
-        npm ci  # Use npm ci for consistent installs in CI
-
-    - name: Set environment variables
-      run: |
-        echo "CYPRESS_baseUrl=https://filmd-apps-dev-uks-app-app-01.azurewebsites.net" >> $GITHUB_ENV
-        echo "CYPRESS_validEmail=${{ secrets.CYPRESS_VALID_EMAIL }}" >> $GITHUB_ENV
-        echo "CYPRESS_validPassword=${{ secrets.CYPRESS_VALID_PASSWORD }}" >> $GITHUB_ENV
+        npm ci
 
     - name: Run Cypress tests (Feature files only)
       run: |
         npx cypress run --browser chrome --headless
       env:
-        CYPRESS_baseUrl: ${{ env.CYPRESS_baseUrl }}
-        CYPRESS_validEmail: ${{ env.CYPRESS_validEmail }}
-        CYPRESS_validPassword: ${{ env.CYPRESS_validPassword }}
+        CYPRESS_baseUrl: https://filmd-apps-dev-uks-app-app-01.azurewebsites.net
+        CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
+        CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
 
     - name: Upload screenshots on failure
       if: failure()
