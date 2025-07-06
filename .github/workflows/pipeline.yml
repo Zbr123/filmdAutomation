@@ -62,11 +62,11 @@ jobs:
 
     - name: Import VPN client certificate
       run: |
-        # Write the .pfx certificate to a file
-        $pfxPath = "client.pfx"
-        [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String($env:VPN_PFX_CERT))
+        # Write the certificate from XML to a .cer file
+        $certPath = "client.cer"
+        [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($env:VPN_PFX_CERT))
         # Import the certificate to the Windows certificate store
-        $cert = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString $env:VPN_PFX_PASSWORD -AsPlainText -Force)
+        $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
         Write-Output "Certificate imported: $cert.Thumbprint"
         # Verify the certificate thumbprint matches the expected value
         if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
@@ -76,13 +76,12 @@ jobs:
       shell: powershell
       env:
         VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
-        VPN_PFX_PASSWORD: ${{ secrets.VPN_PFX_PASSWORD }}
 
     - name: Configure and connect to Azure VPN
       run: |
         # Create an SSTP VPN connection
         Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
-        # Connect to the VPN
+        # Attempt to connect to the VPN (may require manual credentials or pre-configuration)
         rasdial "AzureVPN"
         # Wait for connection
         Start-Sleep -Seconds 15
