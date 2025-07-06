@@ -64,13 +64,27 @@ jobs:
       run: |
         # Write the certificate from XML to a .cer file
         $certPath = "client.cer"
-        [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($env:VPN_PFX_CERT))
-        # Import the certificate to the Windows certificate store
-        $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
-        Write-Output "Certificate imported: $cert.Thumbprint"
-        # Verify the certificate thumbprint matches the expected value
-        if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
-          Write-Error "Certificate thumbprint mismatch"
+        # Clean the Base64 string (remove line breaks and whitespace)
+        $base64String = $env:VPN_PFX_CERT -replace '\s+', ''
+        try {
+          # Validate Base64 string length
+          $base64Length = $base64String.Length
+          Write-Output "Base64 string length: $base64Length"
+          if ($base64Length % 4 -ne 0) {
+            Write-Error "Base64 string length is not a multiple of 4"
+            exit 1
+          }
+          [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($base64String))
+          # Import the certificate to the Windows certificate store
+          $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
+          Write-Output "Certificate imported: $cert.Thumbprint"
+          # Verify the certificate thumbprint matches the expected value
+          if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
+            Write-Error "Certificate thumbprint mismatch"
+            exit 1
+          }
+        } catch {
+          Write-Error "Failed to import certificate: $_"
           exit 1
         }
       shell: powershell
@@ -80,16 +94,20 @@ jobs:
     - name: Configure and connect to Azure VPN
       run: |
         # Create an SSTP VPN connection
-        Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
-        # Attempt to connect to the VPN (may require manual credentials or pre-configuration)
-        rasdial "AzureVPN"
-        # Wait for connection
-        Start-Sleep -Seconds 15
-        # Verify connectivity to internal resource
-        Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
+        try {
+          Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
+          # Connect to the VPN
+          rasdial "AzureVPN"
+          # Wait for connection
+          Start-Sleep -Seconds 15
+          # Verify connectivity to internal resource
+          Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
+        } catch {
+          Write-Error "VPN connection failed: $_"
+          exit 1
+        }
       shell: powershell
       env:
-        SERVER_SECRET: ${{ secrets.SERVER_SECRET }}
         TENANT: ${{ secrets.TENANT }}
         AUDIENCE: ${{ secrets.AUDIENCE }}
         ISSUER: ${{ secrets.ISSUER }}
