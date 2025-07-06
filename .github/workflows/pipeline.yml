@@ -60,14 +60,6 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install Azure VPN Client dependencies
-      run: |
-        # Azure VPN Client installation from Microsoft Store is not easily automated
-        # Attempt to install dependencies or verify pre-installed client
-        Write-Output "Checking for Azure VPN Client..."
-        # Placeholder: Manual installation may be required on a self-hosted runner
-      shell: powershell
-
     - name: Import VPN client certificate
       run: |
         # Write the .pfx certificate to a file
@@ -76,6 +68,11 @@ jobs:
         # Import the certificate to the Windows certificate store
         $cert = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString $env:VPN_PFX_PASSWORD -AsPlainText -Force)
         Write-Output "Certificate imported: $cert.Thumbprint"
+        # Verify the certificate thumbprint matches the expected value
+        if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
+          Write-Error "Certificate thumbprint mismatch"
+          exit 1
+        }
       shell: powershell
       env:
         VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
@@ -83,14 +80,14 @@ jobs:
 
     - name: Configure and connect to Azure VPN
       run: |
-        # Create a VPN profile using PowerShell
-        Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod MsChapv2 -AllUserConnection
-        # Attempt to connect (may require certificate-based auth or pre-configuration)
+        # Create an SSTP VPN connection
+        Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
+        # Connect to the VPN
         rasdial "AzureVPN"
         # Wait for connection
         Start-Sleep -Seconds 15
-        # Verify connectivity (replace with your internal resource)
-        Test-Connection -ComputerName "internal.example.com" -Count 4 -ErrorAction Stop
+        # Verify connectivity to internal resource
+        Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
       shell: powershell
       env:
         SERVER_SECRET: ${{ secrets.SERVER_SECRET }}
