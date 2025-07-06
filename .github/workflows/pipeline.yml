@@ -1,82 +1,5 @@
 # name: Run Cypress Tests
 
-# # Trigger the workflow on push to master branch
-# on:
-#   push:
-#     branches:
-#       - master  # You can add other branches if needed
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Checkout the repository
-#       uses: actions/checkout@v2
-
-#     - name: Set up Node.js (v16 or higher)
-#       uses: actions/setup-node@v2
-#       with:
-#         node-version: '16'  # Change to Node.js v16 or later
-
-#     - name: Install dependencies
-#       run: |
-#         npm install  # Ensure Cypress and all dependencies are installed
-
-#     - name: Run Cypress tests (Feature files only)
-#       run: |
-#         npx cypress run 
-
-#     # Optionally, you can add a step to log the result of the tests (pass/fail status)
-#     - name: Display test result
-#       run: |
-#         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
-
-# name: Run Cypress Tests
-
-# on:
-#   push:
-#     branches:
-#       - master
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Checkout the repository
-#       uses: actions/checkout@v4
-
-#     - name: Set up Node.js
-#       uses: actions/setup-node@v4
-#       with:
-#         node-version: '18'
-
-#     - name: Install dependencies
-#       run: |
-#         npm ci
-
-#     - name: Run Cypress tests (Feature files only)
-#       run: |
-#         npx cypress run --browser chrome --headless
-#       env:
-#         CYPRESS_baseUrl: https://filmd-apps-dev-uks-app-app-01.azurewebsites.net
-#         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
-#         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
-
-#     - name: Upload screenshots on failure
-#       if: failure()
-#       uses: actions/upload-artifact@v4
-#       with:
-#         name: cypress-screenshots
-#         path: cypress/screenshots/
-
-#     - name: Display test result
-#       run: |
-#         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
-
-# name: Run Cypress Tests
-
 # on:
 #   push:
 #     branches:
@@ -103,7 +26,6 @@
 #       run: |
 #         npx cypress run --browser chrome --headless --config video=false --env retries=2
 #       env:
-#         CYPRESS_baseUrl: https://filmd-apps-dev-uks-app-app-01.azurewebsites.net
 #         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
 #         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
 
@@ -117,7 +39,7 @@
 #     - name: Display test result
 #       run: |
 #         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
-# exit
+
 name: Run Cypress Tests
 
 on:
@@ -127,7 +49,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout the repository
@@ -138,16 +60,57 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Install Azure VPN Client dependencies
+      run: |
+        # Azure VPN Client installation from Microsoft Store is not easily automated
+        # Attempt to install dependencies or verify pre-installed client
+        Write-Output "Checking for Azure VPN Client..."
+        # Placeholder: Manual installation may be required on a self-hosted runner
+      shell: powershell
+
+    - name: Import VPN client certificate
+      run: |
+        # Write the .pfx certificate to a file
+        $pfxPath = "client.pfx"
+        [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String($env:VPN_PFX_CERT))
+        # Import the certificate to the Windows certificate store
+        $cert = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString $env:VPN_PFX_PASSWORD -AsPlainText -Force)
+        Write-Output "Certificate imported: $cert.Thumbprint"
+      shell: powershell
+      env:
+        VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
+        VPN_PFX_PASSWORD: ${{ secrets.VPN_PFX_PASSWORD }}
+
+    - name: Configure and connect to Azure VPN
+      run: |
+        # Create a VPN profile using PowerShell
+        Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod MsChapv2 -AllUserConnection
+        # Attempt to connect (may require certificate-based auth or pre-configuration)
+        rasdial "AzureVPN"
+        # Wait for connection
+        Start-Sleep -Seconds 15
+        # Verify connectivity (replace with your internal resource)
+        Test-Connection -ComputerName "internal.example.com" -Count 4 -ErrorAction Stop
+      shell: powershell
+      env:
+        SERVER_SECRET: ${{ secrets.SERVER_SECRET }}
+        TENANT: ${{ secrets.TENANT }}
+        AUDIENCE: ${{ secrets.AUDIENCE }}
+        ISSUER: ${{ secrets.ISSUER }}
+
     - name: Install dependencies
       run: |
         npm ci
+      shell: powershell
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser chrome --headless --config video=false --env retries=2
+        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL
+      shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
+        CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
 
     - name: Upload screenshots on failure
       if: failure()
@@ -158,4 +121,5 @@ jobs:
 
     - name: Display test result
       run: |
-        if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
+        if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed"; exit 1 }
+      shell: powershell
