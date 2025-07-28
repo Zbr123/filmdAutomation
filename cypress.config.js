@@ -1,27 +1,33 @@
-/new code
+// Load environment variables from .env file
 require('dotenv').config();
 const { defineConfig } = require("cypress");
 const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
 const { addCucumberPreprocessorPlugin } = require("@badeball/cypress-cucumber-preprocessor");
 const { createEsbuildPlugin } = require("@badeball/cypress-cucumber-preprocessor/esbuild");
 const { WebClient } = require("@slack/web-api");
+
 module.exports = defineConfig({
   e2e: {
-    specPattern: "cypress/e2e/**/*.feature",
+    specPattern: "cypress/e2e/**/*.feature", // Look for all feature files
     async setupNodeEvents(on, config) {
+      // Add the Cucumber Preprocessor plugin
       await addCucumberPreprocessorPlugin(on, config);
+
+      // Add ESBuild preprocessor to handle .feature files
       on("file:preprocessor", createBundler({
         plugins: [createEsbuildPlugin(config)],
       }));
-      // Initialize Slack WebClient
-      const slackToken = process.env.SLACK_BOT_TOKEN || config.env.slackBotToken;
-      const slackUserId = process.env.SLACK_USER_ID || config.env.slackUserId;
+
+      // Initialize Slack WebClient from .env variables
+      const slackToken = process.env.SLACK_BOT_TOKEN;  // Securely load from .env
+      const slackUserId = process.env.SLACK_USER_ID;  // Securely load from .env
       const slackClient = new WebClient(slackToken);
+
       // After run event to send Slack DM on test failure
       on("after:run", async (results) => {
         if (results.totalFailed > 0) {
           const message = {
-            channel: slackUserId, // Autiomationtesting's Slack user ID for DM
+            channel: slackUserId, // Automationtesting's Slack user ID for DM
             text: `:x: *Cypress Test Failure Alert* :x:\n` +
                   `Environment: ${config.env.baseUrl}\n` +
                   `Total Tests: ${results.totalTests}\n` +
@@ -30,14 +36,16 @@ module.exports = defineConfig({
                   `Run Time: ${new Date(results.endedAt).toLocaleString('en-US', { timeZone: 'Asia/Karachi' })}\n` +
                   `Check test results for details.`,
           };
+
           try {
             await slackClient.chat.postMessage(message);
-            console.log("Slack DM sent successfully to Autiomationtesting.");
+            console.log("Slack DM sent successfully to Automationtesting.");
           } catch (error) {
             console.error("Failed to send Slack DM:", error);
           }
         }
       });
+
       return config;
     },
     env: {
