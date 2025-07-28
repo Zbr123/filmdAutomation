@@ -2,7 +2,7 @@ Feature: Login Feature
 
   Scenario: Login with valid credentials
     Given I am on the login page
-    When I enters email "zubair.a@yetiinc.com" and password "Vista123+"
+    When I enters email "muhammad.a@yetiinc.com" and password "Staging2024"
     And clicks on login button
     Then I should see the dashboard page
 

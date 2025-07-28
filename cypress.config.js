@@ -49,7 +49,7 @@ module.exports = defineConfig({
       return config;
     },
     env: {
-      baseUrl: process.env.CYPRESS_baseUrl || "https://filmd-apps-dev-uks-app-app-01.azurewebsites.net",
+      baseUrl: process.env.CYPRESS_baseUrl || "https://dev-app.filmd.co.uk/",
       validEmail: process.env.CYPRESS_validEmail || "zubair.a@yetiinc.com",
       validPassword: process.env.CYPRESS_validPassword || "Vista123+",
       slackBotToken: process.env.SLACK_BOT_TOKEN,  // Using the env variable for Slack token

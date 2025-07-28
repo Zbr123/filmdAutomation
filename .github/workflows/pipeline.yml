@@ -160,6 +160,103 @@
 #       run: |
 #         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
 
+# name: Run Cypress Tests
+
+# on:
+#   push:
+#     branches:
+#       - master
+
+# jobs:
+#   test:
+#     runs-on: windows-latest
+
+#     steps:
+#     - name: Checkout the repository
+#       uses: actions/checkout@v4
+
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: '18'
+
+#     - name: Import VPN client certificate
+#       run: |
+#         # Write the certificate from XML to a .cer file
+#         $certPath = "client.cer"
+#         # Clean the Base64 string (remove line breaks and whitespace)
+#         $base64String = $env:VPN_PFX_CERT -replace '\s+', ''
+#         try {
+#           # Validate Base64 string length
+#           $base64Length = $base64String.Length
+#           Write-Output "Base64 string length: $base64Length"
+#           if ($base64Length % 4 -ne 0) {
+#             Write-Error "Base64 string length is not a multiple of 4"
+#             exit 1
+#           }
+#           [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($base64String))
+#           # Import the certificate to the Windows certificate store
+#           $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
+#           Write-Output "Certificate imported: $cert.Thumbprint"
+#           # Verify the certificate thumbprint matches the expected value
+#           if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
+#             Write-Error "Certificate thumbprint mismatch"
+#             exit 1
+#           }
+#         } catch {
+#           Write-Error "Failed to import certificate: $_"
+#           exit 1
+#         }
+#       shell: powershell
+#       env:
+#         VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
+
+#     - name: Configure and connect to Azure VPN
+#       run: |
+#         # Create an SSTP VPN connection
+#         try {
+#           Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
+#           # Connect to the VPN
+#           rasdial "AzureVPN"
+#           # Wait for connection
+#           Start-Sleep -Seconds 15
+#           # Verify connectivity to internal resource
+#           Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
+#         } catch {
+#           Write-Error "VPN connection failed: $_"
+#           exit 1
+#         }
+#       shell: powershell
+#       env:
+#         TENANT: ${{ secrets.TENANT }}
+#         AUDIENCE: ${{ secrets.AUDIENCE }}
+#         ISSUER: ${{ secrets.ISSUER }}
+
+#     - name: Install dependencies
+#       run: |
+#         npm ci
+#       shell: powershell
+
+#     - name: Run Cypress tests (Feature files only)
+#       run: |
+#         npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL
+#       shell: powershell
+#       env:
+#         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
+#         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
+#         CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
+
+#     - name: Upload screenshots on failure
+#       if: failure()
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: cypress-screenshots
+#         path: cypress/screenshots/
+
+#     - name: Display test result
+#       run: |
+#         if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed"; exit 1 }
+#       shell: powershell
 name: Run Cypress Tests
 
 on:
@@ -180,58 +277,6 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Import VPN client certificate
-      run: |
-        # Write the certificate from XML to a .cer file
-        $certPath = "client.cer"
-        # Clean the Base64 string (remove line breaks and whitespace)
-        $base64String = $env:VPN_PFX_CERT -replace '\s+', ''
-        try {
-          # Validate Base64 string length
-          $base64Length = $base64String.Length
-          Write-Output "Base64 string length: $base64Length"
-          if ($base64Length % 4 -ne 0) {
-            Write-Error "Base64 string length is not a multiple of 4"
-            exit 1
-          }
-          [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($base64String))
-          # Import the certificate to the Windows certificate store
-          $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
-          Write-Output "Certificate imported: $cert.Thumbprint"
-          # Verify the certificate thumbprint matches the expected value
-          if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
-            Write-Error "Certificate thumbprint mismatch"
-            exit 1
-          }
-        } catch {
-          Write-Error "Failed to import certificate: $_"
-          exit 1
-        }
-      shell: powershell
-      env:
-        VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
-
-    - name: Configure and connect to Azure VPN
-      run: |
-        # Create an SSTP VPN connection
-        try {
-          Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
-          # Connect to the VPN
-          rasdial "AzureVPN"
-          # Wait for connection
-          Start-Sleep -Seconds 15
-          # Verify connectivity to internal resource
-          Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
-        } catch {
-          Write-Error "VPN connection failed: $_"
-          exit 1
-        }
-      shell: powershell
-      env:
-        TENANT: ${{ secrets.TENANT }}
-        AUDIENCE: ${{ secrets.AUDIENCE }}
-        ISSUER: ${{ secrets.ISSUER }}
-
     - name: Install dependencies
       run: |
         npm ci
@@ -239,12 +284,14 @@ jobs:
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL
+        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
       shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
         CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
 
     - name: Upload screenshots on failure
       if: failure()
