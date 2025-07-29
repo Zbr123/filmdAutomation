@@ -358,6 +358,11 @@ jobs:
         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
         DEBUG: cypress:*  # Enable detailed Cypress logging
 
+    - name: Print LASTEXITCODE
+      run: |
+        Write-Output "Cypress exit code: $LASTEXITCODE"
+      shell: powershell
+
     - name: Upload screenshots on failure
       if: failure()
       uses: actions/upload-artifact@v4
