@@ -341,9 +341,14 @@ jobs:
       run: dir cypress/e2e
       shell: powershell
 
+    - name: Clear screenshots folder
+      run: |
+        Remove-Item -Path cypress/screenshots/* -Recurse -Force -ErrorAction SilentlyContinue
+      shell: powershell
+
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID --verbose
+        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
       shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
@@ -351,13 +356,7 @@ jobs:
         CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
-
-    - name: Upload Cypress test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: cypress-results
-        path: cypress/results/
+        DEBUG: cypress:*  # Enable detailed Cypress logging
 
     - name: Upload screenshots on failure
       if: failure()
@@ -365,6 +364,7 @@ jobs:
       with:
         name: cypress-screenshots
         path: cypress/screenshots/
+        if-no-files-found: warn
 
     - name: Display test result
       run: |
