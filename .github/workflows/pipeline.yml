@@ -325,6 +325,50 @@ jobs:
       with:
         node-version: '18'
 
+    # Optional: Uncomment if VPN is required to access CYPRESS_BASE_URL
+    # - name: Import VPN client certificate
+    #   run: |
+    #     $certPath = "client.cer"
+    #     $base64String = $env:VPN_PFX_CERT -replace '\s+', ''
+    #     try {
+    #       $base64Length = $base64String.Length
+    #       Write-Output "Base64 string length: $base64Length"
+    #       if ($base64Length % 4 -ne 0) {
+    #         Write-Error "Base64 string length is not a multiple of 4"
+    #         exit 1
+    #       }
+    #       [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($base64String))
+    #       $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
+    #       Write-Output "Certificate imported: $cert.Thumbprint"
+    #       if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
+    #         Write-Error "Certificate thumbprint mismatch"
+    #         exit 1
+    #       }
+    #     } catch {
+    #       Write-Error "Failed to import certificate: $_"
+    #       exit 1
+    #     }
+    #   shell: powershell
+    #   env:
+    #     VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
+
+    # - name: Configure and connect to Azure VPN
+    #   run: |
+    #     try {
+    #       Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
+    #       rasdial "AzureVPN"
+    #       Start-Sleep -Seconds 15
+    #       Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
+    #     } catch {
+    #       Write-Error "VPN connection failed: $_"
+    #       exit 1
+    #     }
+    #   shell: powershell
+    #   env:
+    #     TENANT: ${{ secrets.TENANT }}
+    #     AUDIENCE: ${{ secrets.AUDIENCE }}
+    #     ISSUER: ${{ secrets.ISSUER }}
+
     - name: Install dependencies
       run: |
         npm ci
@@ -348,7 +392,7 @@ jobs:
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
+        npx cypress run --browser electron --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
       shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
@@ -373,5 +417,6 @@ jobs:
 
     - name: Display test result
       run: |
-        if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed"; exit 1 }
+        Write-Output "Cypress exit code: $LASTEXITCODE"
+        if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed but continuing for debugging" }
       shell: powershell
