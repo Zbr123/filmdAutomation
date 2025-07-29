@@ -392,7 +392,7 @@ jobs:
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser electron --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
+        npx cypress run --browser electron --headless --config video=false,specPattern=cypress/e2e/features/*.feature --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
       shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
@@ -406,6 +406,7 @@ jobs:
       run: |
         Write-Output "Cypress exit code: $LASTEXITCODE"
       shell: powershell
+      continue-on-error: true
 
     - name: Upload screenshots on failure
       if: failure()
@@ -420,3 +421,4 @@ jobs:
         Write-Output "Cypress exit code: $LASTEXITCODE"
         if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed but continuing for debugging" }
       shell: powershell
+      continue-on-error: true
