@@ -257,6 +257,54 @@
 #       run: |
 #         if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed"; exit 1 }
 #       shell: powershell
+# name: Run Cypress Tests
+
+# on:
+#   push:
+#     branches:
+#       - master
+
+# jobs:
+#   test:
+#     runs-on: windows-latest
+
+#     steps:
+#     - name: Checkout the repository
+#       uses: actions/checkout@v4
+
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: '18'
+
+#     - name: Install dependencies
+#       run: |
+#         npm ci
+#       shell: powershell
+
+#     - name: Run Cypress tests (Feature files only)
+#       run: |
+#         npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
+#       shell: powershell
+#       env:
+#         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
+#         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
+#         CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
+#         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
+
+#     - name: Upload screenshots on failure
+#       if: failure()
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: cypress-screenshots
+#         path: cypress/screenshots/
+
+#     - name: Display test result
+#       run: |
+#         if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed"; exit 1 }
+#       shell: powershell
+# updated code
 name: Run Cypress Tests
 
 on:
@@ -282,9 +330,20 @@ jobs:
         npm ci
       shell: powershell
 
+    - name: Debug environment variables
+      run: |
+        echo "CYPRESS_BASE_URL: $env:CYPRESS_BASE_URL"
+        echo "SLACK_BOT_TOKEN: $env:SLACK_BOT_TOKEN"
+        echo "SLACK_USER_ID: $env:SLACK_USER_ID"
+      shell: powershell
+
+    - name: List Cypress feature files
+      run: dir cypress/e2e
+      shell: powershell
+
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
+        npx cypress run --browser chrome --headless --config video=false --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID --verbose
       shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
@@ -292,6 +351,13 @@ jobs:
         CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
+
+    - name: Upload Cypress test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-results
+        path: cypress/results/
 
     - name: Upload screenshots on failure
       if: failure()
