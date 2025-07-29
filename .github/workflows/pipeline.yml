@@ -118,47 +118,47 @@
 #       run: |
 #         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
 # exit
-# name: Run Cypress Tests
+name: Run Cypress Tests
 
-# on:
-#   push:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-#     steps:
-#     - name: Checkout the repository
-#       uses: actions/checkout@v4
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
 
-#     - name: Set up Node.js
-#       uses: actions/setup-node@v4
-#       with:
-#         node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-#     - name: Install dependencies
-#       run: |
-#         npm ci
+    - name: Install dependencies
+      run: |
+        npm ci
 
-#     - name: Run Cypress tests (Feature files only)
-#       run: |
-#         npx cypress run --browser chrome --headless --config video=false --env retries=2
-#       env:
-#         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
-#         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
+    - name: Run Cypress tests (Feature files only)
+      run: |
+        npx cypress run --browser chrome --headless --config video=false --env retries=2
+      env:
+        CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
+        CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
 
-#     - name: Upload screenshots on failure
-#       if: failure()
-#       uses: actions/upload-artifact@v4
-#       with:
-#         name: cypress-screenshots
-#         path: cypress/screenshots/
+    - name: Upload screenshots on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots/
 
-#     - name: Display test result
-#       run: |
-#         if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
+    - name: Display test result
+      run: |
+        if [ $? -eq 0 ]; then echo "Cypress tests passed"; else echo "Cypress tests failed"; exit 1; fi
 
 # name: Run Cypress Tests
 
@@ -305,136 +305,136 @@
 #         if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed"; exit 1 }
 #       shell: powershell
 # updated code
-name: Run Cypress Tests
+# name: Run Cypress Tests
 
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
 
-jobs:
-  test:
-    runs-on: windows-latest
+# jobs:
+#   test:
+#     runs-on: windows-latest
 
-    steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v4
+#     steps:
+#     - name: Checkout the repository
+#       uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: '18'
 
-    - name: Verify Node.js and npm versions
-      run: |
-        node --version
-        npm --version
-      shell: powershell
+#     - name: Verify Node.js and npm versions
+#       run: |
+#         node --version
+#         npm --version
+#       shell: powershell
 
-    # Optional: Uncomment if VPN is required to access CYPRESS_BASE_URL
-    # - name: Import VPN client certificate
-    #   run: |
-    #     $certPath = "client.cer"
-    #     $base64String = $env:VPN_PFX_CERT -replace '\s+', ''
-    #     try {
-    #       $base64Length = $base64String.Length
-    #       Write-Output "Base64 string length: $base64Length"
-    #       if ($base64Length % 4 -ne 0) {
-    #         Write-Error "Base64 string length is not a multiple of 4"
-    #         exit 1
-    #       }
-    #       [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($base64String))
-    #       $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
-    #       Write-Output "Certificate imported: $cert.Thumbprint"
-    #       if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
-    #         Write-Error "Certificate thumbprint mismatch"
-    #         exit 1
-    #       }
-    #     } catch {
-    #       Write-Error "Failed to import certificate: $_"
-    #       exit 1
-    #     }
-    #   shell: powershell
-    #   env:
-    #     VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
+#     # Optional: Uncomment if VPN is required to access CYPRESS_BASE_URL
+#     # - name: Import VPN client certificate
+#     #   run: |
+#     #     $certPath = "client.cer"
+#     #     $base64String = $env:VPN_PFX_CERT -replace '\s+', ''
+#     #     try {
+#     #       $base64Length = $base64String.Length
+#     #       Write-Output "Base64 string length: $base64Length"
+#     #       if ($base64Length % 4 -ne 0) {
+#     #         Write-Error "Base64 string length is not a multiple of 4"
+#     #         exit 1
+#     #       }
+#     #       [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($base64String))
+#     #       $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My -ErrorAction Stop
+#     #       Write-Output "Certificate imported: $cert.Thumbprint"
+#     #       if ($cert.Thumbprint -ne "DF3C24F9BFD666761B268073FE06D1CC8D4F82A4") {
+#     #         Write-Error "Certificate thumbprint mismatch"
+#     #         exit 1
+#     #       }
+#     #     } catch {
+#     #       Write-Error "Failed to import certificate: $_"
+#     #       exit 1
+#     #     }
+#     #   shell: powershell
+#     #   env:
+#     #     VPN_PFX_CERT: ${{ secrets.VPN_PFX_CERT }}
 
-    # - name: Configure and connect to Azure VPN
-    #   run: |
-    #     try {
-    #       Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
-    #       rasdial "AzureVPN"
-    #       Start-Sleep -Seconds 15
-    #       Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
-    #     } catch {
-    #       Write-Error "VPN connection failed: $_"
-    #       exit 1
-    #     }
-    #   shell: powershell
-    #   env:
-    #     TENANT: ${{ secrets.TENANT }}
-    #     AUDIENCE: ${{ secrets.AUDIENCE }}
-    #     ISSUER: ${{ secrets.ISSUER }}
+#     # - name: Configure and connect to Azure VPN
+#     #   run: |
+#     #     try {
+#     #       Add-VpnConnection -Name "AzureVPN" -ServerAddress "azuregateway-296e0072-7ce4-4da3-9317-2f673bf0fe67-6ed09dc891f6.vpn.azure.com" -TunnelType Sstp -AuthenticationMethod Eap -AllUserConnection -ErrorAction Stop
+#     #       rasdial "AzureVPN"
+#     #       Start-Sleep -Seconds 15
+#     #       Test-Connection -ComputerName "10.10.0.68" -Count 4 -ErrorAction Stop
+#     #     } catch {
+#     #       Write-Error "VPN connection failed: $_"
+#     #       exit 1
+#     #     }
+#     #   shell: powershell
+#     #   env:
+#     #     TENANT: ${{ secrets.TENANT }}
+#     #     AUDIENCE: ${{ secrets.AUDIENCE }}
+#     #     ISSUER: ${{ secrets.ISSUER }}
 
-    - name: Install dependencies
-      run: |
-        npm ci
-      shell: powershell
+#     - name: Install dependencies
+#       run: |
+#         npm ci
+#       shell: powershell
 
-    - name: Debug environment variables
-      run: |
-        echo "CYPRESS_BASE_URL: $env:CYPRESS_BASE_URL"
-        echo "SLACK_BOT_TOKEN: $env:SLACK_BOT_TOKEN"
-        echo "SLACK_USER_ID: $env:SLACK_USER_ID"
-      shell: powershell
+#     - name: Debug environment variables
+#       run: |
+#         echo "CYPRESS_BASE_URL: $env:CYPRESS_BASE_URL"
+#         echo "SLACK_BOT_TOKEN: $env:SLACK_BOT_TOKEN"
+#         echo "SLACK_USER_ID: $env:SLACK_USER_ID"
+#       shell: powershell
 
-    - name: List Cypress feature files
-      run: dir cypress/e2e/features
-      shell: powershell
+#     - name: List Cypress feature files
+#       run: dir cypress/e2e/features
+#       shell: powershell
 
-    - name: Clear screenshots folder
-      run: |
-        Remove-Item -Path cypress/screenshots/* -Recurse -Force -ErrorAction SilentlyContinue
-      shell: powershell
+#     - name: Clear screenshots folder
+#       run: |
+#         Remove-Item -Path cypress/screenshots/* -Recurse -Force -ErrorAction SilentlyContinue
+#       shell: powershell
 
-    - name: Run Cypress tests (Feature files only)
-      run: |
-        $ErrorActionPreference = "Stop"
-        npx cypress run --browser electron --headless --config video=false,specPattern=cypress/e2e/features/*.feature --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID 2>&1 | Tee-Object -FilePath cypress-test-output.txt
-        Write-Output "Cypress command completed with exit code: $LASTEXITCODE"
-      shell: powershell
-      env:
-        CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
-        CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
-        CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
-        DEBUG: cypress:*  # Enable detailed Cypress logging
+#     - name: Run Cypress tests (Feature files only)
+#       run: |
+#         $ErrorActionPreference = "Stop"
+#         npx cypress run --browser electron --headless --config video=false,specPattern=cypress/e2e/features/*.feature --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID 2>&1 | Tee-Object -FilePath cypress-test-output.txt
+#         Write-Output "Cypress command completed with exit code: $LASTEXITCODE"
+#       shell: powershell
+#       env:
+#         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
+#         CYPRESS_validPassword: ${{ secrets.CYPRESS_VALID_PASSWORD }}
+#         CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
+#         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
+#         DEBUG: cypress:*  # Enable detailed Cypress logging
 
-    - name: Upload Cypress test output
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: cypress-test-output
-        path: cypress-test-output.txt
-        if-no-files-found: warn
+#     - name: Upload Cypress test output
+#       if: always()
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: cypress-test-output
+#         path: cypress-test-output.txt
+#         if-no-files-found: warn
 
-    - name: Print LASTEXITCODE
-      run: |
-        Write-Output "Cypress exit code: $LASTEXITCODE"
-      shell: powershell
-      continue-on-error: true
+#     - name: Print LASTEXITCODE
+#       run: |
+#         Write-Output "Cypress exit code: $LASTEXITCODE"
+#       shell: powershell
+#       continue-on-error: true
 
-    - name: Upload screenshots on failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: cypress-screenshots
-        path: cypress/screenshots/
-        if-no-files-found: warn
+#     - name: Upload screenshots on failure
+#       if: failure()
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: cypress-screenshots
+#         path: cypress/screenshots/
+#         if-no-files-found: warn
 
-    - name: Display test result
-      run: |
-        Write-Output "Cypress exit code: $LASTEXITCODE"
-        if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed but continuing for debugging" }
-      shell: powershell
-      continue-on-error: true
+#     - name: Display test result
+#       run: |
+#         Write-Output "Cypress exit code: $LASTEXITCODE"
+#         if ($LASTEXITCODE -eq 0) { Write-Output "Cypress tests passed" } else { Write-Output "Cypress tests failed but continuing for debugging" }
+#       shell: powershell
+#       continue-on-error: true
