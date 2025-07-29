@@ -325,6 +325,12 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Verify Node.js and npm versions
+      run: |
+        node --version
+        npm --version
+      shell: powershell
+
     # Optional: Uncomment if VPN is required to access CYPRESS_BASE_URL
     # - name: Import VPN client certificate
     #   run: |
@@ -382,7 +388,7 @@ jobs:
       shell: powershell
 
     - name: List Cypress feature files
-      run: dir cypress/e2e
+      run: dir cypress/e2e/features
       shell: powershell
 
     - name: Clear screenshots folder
@@ -392,7 +398,9 @@ jobs:
 
     - name: Run Cypress tests (Feature files only)
       run: |
-        npx cypress run --browser electron --headless --config video=false,specPattern=cypress/e2e/features/*.feature --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID
+        $ErrorActionPreference = "Stop"
+        npx cypress run --browser electron --headless --config video=false,specPattern=cypress/e2e/features/*.feature --env retries=2,baseUrl=$env:CYPRESS_BASE_URL,slackBotToken=$env:SLACK_BOT_TOKEN,slackUserId=$env:SLACK_USER_ID 2>&1 | Tee-Object -FilePath cypress-test-output.txt
+        Write-Output "Cypress command completed with exit code: $LASTEXITCODE"
       shell: powershell
       env:
         CYPRESS_validEmail: ${{ secrets.CYPRESS_VALID_EMAIL }}
@@ -401,6 +409,14 @@ jobs:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
         DEBUG: cypress:*  # Enable detailed Cypress logging
+
+    - name: Upload Cypress test output
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-test-output
+        path: cypress-test-output.txt
+        if-no-files-found: warn
 
     - name: Print LASTEXITCODE
       run: |
