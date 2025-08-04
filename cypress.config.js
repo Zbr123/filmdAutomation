@@ -273,18 +273,12 @@
 //   },
 // });
 
-require('dotenv').config();
-const { defineConfig } = require("cypress");
-const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
-const { addCucumberPreprocessorPlugin } = require("@badeball/cypress-cucumber-preprocessor");
-const { createEsbuildPlugin } = require("@badeball/cypress-cucumber-preprocessor/esbuild");
-const { WebClient } = require("@slack/web-api");
-const { execSync } = require("child_process"); // Add this to run the commands programmatically
+const { execSync } = require('child_process'); // Add this to run the commands programmatically
 
 module.exports = defineConfig({
   e2e: {
     specPattern: "cypress/e2e/**/*.feature",
-    reporter: 'mocha-allure-reporter',  // Use mocha-allure-reporter
+    reporter: 'mocha-allure-reporter', // Use mocha-allure-reporter
     reporterOptions: {
       allureResultsPath: 'allure-results', // Ensure the results path
     },
@@ -302,6 +296,22 @@ module.exports = defineConfig({
           return null;
         },
       });
+
+      // Skip allure open on CI/CD
+      if (process.env.CI) {
+        console.log("CI environment detected, skipping allure:open");
+      } else {
+        // Only run allure:open if not on CI/CD (locally)
+        try {
+          console.log("Running allure:generate...");
+          execSync('npm run allure:generate', { stdio: 'inherit' });
+
+          console.log("Running allure:open...");
+          execSync('npm run allure:open', { stdio: 'inherit' });
+        } catch (error) {
+          console.error("Error generating or opening Allure report:", error);
+        }
+      }
 
       // Slack Notification Logic (same as before)
       const slackToken = process.env.SLACK_BOT_TOKEN;
@@ -337,17 +347,6 @@ module.exports = defineConfig({
           } else {
             console.log("No test failures, skipping Slack notification.");
           }
-
-          // Automatically generate and open the Allure report after tests complete
-          try {
-            console.log("Running allure:generate...");
-            execSync('npm run allure:generate', { stdio: 'inherit' });
-
-            console.log("Running allure:open...");
-            execSync('npm run allure:open', { stdio: 'inherit' });
-          } catch (error) {
-            console.error("Error generating or opening Allure report:", error);
-          }
         });
       } else {
         console.log("Skipping Slack notification: SLACK_BOT_TOKEN or SLACK_USER_ID missing.");
@@ -366,6 +365,7 @@ module.exports = defineConfig({
     },
   },
 });
+
 
 
 
