@@ -91,7 +91,7 @@
 //     },
 //   },
 // });
-
+// new
 require('dotenv').config();
 const { defineConfig } = require("cypress");
 const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
