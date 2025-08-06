@@ -2,7 +2,7 @@ Feature: Create a new Production
 
   Scenario: User should be able to create a new production
     Given I am on the login page
-    When I enters email "muhammad.a@yetiinc.com" and password "Staging2024"
+    When I aenters email "muhammad.a@yetiinc.com" and password "Staging2024"
     And clicks on login button
     Then I should see the dashboard page
     When I click on the side navbar
