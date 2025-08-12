@@ -6,9 +6,9 @@ Feature: Production Search
     And clicks on login button
     Then I should see the dashboard page
     When I click on the side navbar
-    And I click on Productions text
-    And I click on Production List text
-    Then I should see Production Search text
+    And I click on the "Productions" text
+    And I click on "Productions List" text
+    Then I should see "Production Search" text
     When I click on the Advanced Search button
     And I click on the Type dropdown
     And I select "Animation" from the Type dropdown
@@ -26,9 +26,9 @@ Feature: Production Search
     And clicks on login button
     Then I should see the dashboard page
     When I click on the side navbar
-    And I click on Productions text
-    And I click on Production List text
-    Then I should see Production Search text
+    And I click on the "Productions" text
+    And I click on "Productions List" text
+    Then I should see "Production Search" text
     When I click on the Advanced Search button
     And I click on the Type dropdown
     And I select "Arena" from the Type dropdown
