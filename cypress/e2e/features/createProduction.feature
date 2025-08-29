@@ -6,8 +6,12 @@ Feature: Create a new Production
     And clicks on login button
     Then I should see the dashboard page
     When I click on the side navbar
-    And I click on Productions text
-    And I click on Production Suite text
+    And I click on the "Productions" text
+    And I click on "Production Suite" text
+
+    
+    # And I click on Productions text
+    # And I click on Production Suite text
     Then I should see Welcome to Productions text
     When I click on the Create Production button
     Then I should see Production Creation text
