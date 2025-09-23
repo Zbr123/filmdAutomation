@@ -4,17 +4,20 @@ class ProductionSearchPage {
     cy.xpath('//a[@id="navbarDropdownMM-1" and contains(@class, "nav-link dropdown-toggle menu-bar-icon")]').click();
   }
 
-  clickProductionsText() {
-    cy.xpath('//span[contains(@class, "qLink-link-menuText") and contains(text(), "Productions")]').click();
+  // Dynamic Locators for side menu
+
+  clickTextBySpan(text) {
+    cy.xpath(`//span[contains(text(), "${text}")]`).first().click();
   }
 
-  clickProductionListText() {
-    cy.xpath('//a[contains(@class, "qLink-link dropdown-item icon") and .//span[contains(@class, "qLink-subLink-menuText") and contains(text(), "Productions List")]]').click();
+  clickTextByLink(text) {
+    cy.xpath(`//a[contains(@class, "qLink-link") and contains(., "${text}")]`).click();
   }
 
-  verifyProductionSearchText() {
-    cy.xpath('//h1[@id="pageTitleHeading" and contains(text(), "Production Search")]').should('be.visible');
+  verifyTextByHeading(text) {
+    cy.xpath(`//h1[@id="pageTitleHeading" and contains(text(), "${text}")]`).should('be.visible');
   }
+
 
   clickAdvancedSearchButton() {
     cy.xpath('//a[contains(@class, "advance_search_btn_opt")]').click();
@@ -61,13 +64,6 @@ class ProductionSearchPage {
   verifyNoResults() {
     cy.xpath('//div[contains(@class, "col-12") and contains(text(), "No result found")]').should('be.visible');
   }
-
-
-
-
-
-
-
 }
 
 export default ProductionSearchPage;

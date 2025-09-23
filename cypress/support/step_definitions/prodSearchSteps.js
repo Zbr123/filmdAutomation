@@ -1,23 +1,30 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
 import ProductionSearchPage from "../pageObjects/prodSearchPage";
 
+
 const productionSearch = new ProductionSearchPage();
 
 When("I click on the side navbar", () => {
   productionSearch.clickSideNavbar();
 });
 
-When("I click on Productions text", () => {
-  productionSearch.clickProductionsText();
+// Dynamic steps for side menu
+
+When("I click on the {string} text", (text) => {
+  productionSearch.clickTextBySpan(text);
 });
 
-When("I click on Production List text", () => {
-  productionSearch.clickProductionListText();
+
+When("I click on {string} text", (text) => {
+  productionSearch.clickTextByLink(text);
 });
 
-Then("I should see Production Search text", () => {
-  productionSearch.verifyProductionSearchText();
+
+
+Then("I should see {string} text", (text) => {
+  productionSearch.verifyTextByHeading(text);
 });
+
 
 When("I click on the Advanced Search button", () => {
   productionSearch.clickAdvancedSearchButton();
